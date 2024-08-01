@@ -1,67 +1,92 @@
 package templates
 
 import (
-"os"
-"github.com/marcusp619/united-reason-go/internal/middleware"
+	"github.com/marcusp619/united-reason-go/internal/middleware"
+	"os"
 )
 
-templ header(title string) {
-
-<head>
-  <title>{ title }</title>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="static/script/htmx.min.js" nonce={ middleware.GetHtmxNonce(ctx) }></script>
-  <script src="static/script/response-targets.js" nonce={ middleware.GetResponseTargetsNonce(ctx) }></script>
-  if os.Getenv("env") == "production" {
-  <link rel="stylesheet" href="static/css/style.min.css" nonce={ middleware.GetTwNonce(ctx) } />
-  } else {
-  <link rel="stylesheet" href="static/css/style.css" nonce={ middleware.GetTwNonce(ctx) } />
-  }
-</head>
+templ head(title string) {
+	<head>
+		<title>{ title }</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<script src="static/script/htmx.min.js" nonce={ middleware.GetHtmxNonce(ctx) }></script>
+		<script src="static/script/response-targets.js" nonce={ middleware.GetResponseTargetsNonce(ctx) }></script>
+		if os.Getenv("env") == "production" {
+			<link rel="stylesheet" href="static/css/style.min.css" nonce={ middleware.GetTwNonce(ctx) }/>
+		} else {
+			<link rel="stylesheet" href="static/css/style.css" nonce={ middleware.GetTwNonce(ctx) }/>
+		}
+	</head>
 }
 
 templ footer() {
-<footer class="bg-primary-600 p-4"></footer>
+	<footer class="bg-primary-600 p-4"></footer>
 }
 
-templ nav() {
-<nav class="bg-primary-600 p-4">
-  <div class="container flex justify-between">
-    <ol class="flex space-x-4">
-      <li>
-        <a class="text-gray-200" href="/">Home</a>
-      </li>
-      <li>
-        <a class="text-gray-200" href="/about">About</a>
-      </li>
-    </ol>
-    <ol class="flex space-x-4">
-      if middleware.GetUser(ctx) != nil {
-      <li>
-        <button class="text-gray-200" hx-target="body" hx-swap="innerHTML" hx-post="/logout">Logout</button>
-      </li>
-      } else {
-      <li>
-        <a class="text-gray-200" href="/register">Register</a>
-      </li>
-      <li>
-        <a class="text-gray-200" href="/login">Login</a>
-      </li>
-      }
-    </ol>
-  </div>
-</nav>
+templ header() {
+	<header class="py-10">
+		<div class="container mx-auto">
+			<nav class="relative z-50 flex justify-between">
+				<div class="flex items-center md:gap-x-12">
+					<a href="#" aria-label="Home">
+						<span class="ml-2 text-2xl font-bold text-gray-800">
+							United 
+							<span class="text-2xl font-bold text-blue-600">Reason</span>
+						</span>
+					</a>
+					<div class="hidden md:flex md:gap-x-6">
+						<a href="#features" class="nav-link">Features</a>
+						<a href="#testimonials" class="nav-link">Testimonials</a>
+						<a href="#pricing" class="nav-link">Pricing</a>
+					</div>
+				</div>
+				<div class="flex items-center gap-x-5 md:gap-x-8">
+					<div class="hidden md:block">
+						<a href="/login" class="nav-link">Sign in</a>
+					</div>
+					<a href="/register" class="btn btn-blue">
+						<span>
+							Get started <span class="hidden lg:inline">today</span>
+						</span>
+					</a>
+					<div class="-mr-1 md:hidden">
+						<button class="relative z-10 flex h-8 w-8 items-center justify-center" aria-label="Toggle Navigation" hx-get="mobile-nav.html" hx-trigger="click" hx-target="#mobile-nav" hx-swap="innerHTML">
+							<svg
+								aria-hidden="true"
+								class="h-3.5 w-3.5 overflow-visible stroke-slate-700"
+								fill="none"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<path d="M0 1H14M0 7H14M0 13H14"></path>
+								<path d="M2 2L12 12M12 2L2 12" class="hidden"></path>
+							</svg>
+						</button>
+						<div id="mobile-nav"></div>
+					</div>
+				</div>
+			</nav>
+		</div>
+	</header>
+	// <template id="mobile-nav-template">
+	//     <div class="absolute inset-x-0 top-full mt-4 flex origin-top flex-col rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5">
+	//         <a href="#features" class="block w-full p-2">Features</a>
+	//         <a href="#testimonials" class="block w-full p-2">Testimonials</a>
+	//         <a href="#pricing" class="block w-full p-2">Pricing</a>
+	//         <hr class="m-2 border-slate-300/40" />
+	//         <a href="/login" class="block w-full p-2">Sign in</a>
+	//     </div>
+	// </template>
 }
 
 templ Layout(contents templ.Component, title string) {
-@header(title)
-
-<body class="flex flex-col h-full">
-  @nav()
-  <main class="flex-1 container ">
-    @contents
-  </main>
-  @footer()
-</body>
+	@head(title)
+	<body class="flex flex-col h-full">
+		@header()
+		<main class="flex-1 container ">
+			@contents
+		</main>
+		@footer()
+	</body>
 }
